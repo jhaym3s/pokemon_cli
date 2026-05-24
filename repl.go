@@ -54,5 +54,11 @@ func getCommands() map[string]cliCommands {
 			description: "Exit loop",
 			callBack:    ExitCommand,
 		},
+
+		"map": {
+			name:        "map",
+			description: "Get location from pokeapi",
+			callBack:    LocationCallBack,
+		},
 	}
 }
