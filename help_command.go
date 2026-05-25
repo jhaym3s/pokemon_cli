@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func HelpCallBack() error {
+func HelpCallBack(cfg *Config) error {
 	fmt.Println("Welcome to pokemon CLI")
 	fmt.Println("Available Commands")
 	

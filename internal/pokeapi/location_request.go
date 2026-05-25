@@ -8,10 +8,7 @@ import (
 )
 
 
-func (c *Client) GetLocationList() (PokeLocationResponse, error) {
-	url := "location-area/"
-	fullUrl := baseUrl+url
-
+func (c *Client) LocationList(fullUrl string) (PokeLocationResponse, error){
 	req, err := http.NewRequest("GET", fullUrl, nil)
 
 	if err != nil {
@@ -43,5 +40,37 @@ func (c *Client) GetLocationList() (PokeLocationResponse, error) {
 
 	return  locationResponse, nil
 
+}
+
+
+func (c *Client) GetNextLocationList(nextURL *string) (PokeLocationResponse, error) {
+	url := "location-area/"
+	fullUrl := baseUrl+url
+
+	if nextURL != nil {
+		fullUrl = *nextURL
+	}
+	resp , err := c. LocationList(fullUrl)
+
+	if err != nil {
+		return PokeLocationResponse{}, err
+	}
+
+	return  resp, nil
+	
+}
+
+func (c *Client) GetPrevLocationList(prevURL *string) (PokeLocationResponse, error) {
+
+	if prevURL == nil {
+		return PokeLocationResponse{}, fmt.Errorf("You are in the first page")
+	}
+	resp , err := c. LocationList(*prevURL)
+
+	if err != nil {
+		return PokeLocationResponse{}, err
+	}
+
+	return  resp, nil
 	
 }

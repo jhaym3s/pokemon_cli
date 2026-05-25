@@ -1,6 +1,16 @@
 package main
 
-func main(){
+import "github.com/jhaym3s/pokemon_cli/internal/pokeapi"
 
-	StartRepl()
+  type Config struct{
+	pokeapiClient pokeapi.Client
+	nextURL *string
+	prevURL *string
+  }
+
+func main(){
+	cfg := Config{
+		pokeapiClient:  pokeapi.NewClient(),
+	}
+	StartRepl(&cfg)
 }

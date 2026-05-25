@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func ExitCommand() error{
+func ExitCommand(cfg *Config) error{
 	fmt.Println("Ending program")
 	
 	os.Exit(0)
