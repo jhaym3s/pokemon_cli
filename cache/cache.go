@@ -32,3 +32,22 @@ func (c *Cache)Get(key string)([]byte,bool){
 	return entries.val, ok
  
 }
+
+func (c *Cache)LoopDelete(t time.Duration){
+	ticker := time.NewTicker(t)
+	// defer ticker.Stop()
+	for range ticker.C {
+			c.Delete(t)
+	}
+}
+
+
+
+func (c *Cache)Delete(t time.Duration){
+	fiveMinAgo := time.Now().Add(-t)
+	for key, entry := range c.cache {
+			if (entry.createdAt.Before(fiveMinAgo)) {
+				delete(c.cache, key)
+			}
+		}
+	}

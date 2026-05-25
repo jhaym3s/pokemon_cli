@@ -11,17 +11,32 @@ func TestCreateChase(t *testing.T){
 	t.Error("cache is nil")
 	}
 
-	mockCache.Add("key1", []byte("Val1"))
+	cases := []struct{
+		inputKey string
+		inputedValue []byte
+	}{
+		{
+			inputKey: "key1",
+			inputedValue: []byte("val1"),
+		},
+	}
 
-	actual , ok := mockCache.Get("key1")
+	for _, cs := range cases {
+	
+	mockCache.Add(cs.inputKey, cs.inputedValue)
+
+	actual , ok := mockCache.Get(cs.inputKey)
 
 	if !ok {
 		t.Error("Key does not exist")
 	}
 
-	if string(actual) != "Val1"{
-		t.Error("Value doesnt exist")
+	if string(actual) != string(cs.inputedValue){
+		t.Error("Value doesnt match")
 	}
+	}
+
+	
 	
 
 }
