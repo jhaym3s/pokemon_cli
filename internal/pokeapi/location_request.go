@@ -20,23 +20,34 @@ func (c *Client) LocationList(fullUrl string) (PokeLocationResponse, error){
 		return PokeLocationResponse{}, err
 	}
 
+	data, ok := c.cache.Get(fullUrl)
+		if ok{
+		locationResponse := PokeLocationResponse{}
+
+		err = json.Unmarshal(data, &locationResponse)
+		if err != nil {
+			return PokeLocationResponse{}, err
+		}
+	}
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode > 399{
 		return PokeLocationResponse{}, fmt.Errorf("Bad status code %v", resp.StatusCode)
 	}
 
-	bt, err := io.ReadAll(resp.Body)// this is using the standard io package to read the response body
+	data, err = io.ReadAll(resp.Body) // this is using the standard io package to read the response body
 	 if err != nil {
 		return PokeLocationResponse{}, fmt.Errorf("Error reading file %v ", err)
 	 }
 
 	 locationResponse := PokeLocationResponse{}
 
-	 err = json.Unmarshal(bt, &locationResponse)
-	 if err != nil {
-		return PokeLocationResponse{}, err
-	}
+		err = json.Unmarshal(data, &locationResponse)
+		if err != nil {
+			return PokeLocationResponse{}, err
+		}
+	c.cache.Add(fullUrl,data)
 
 	return  locationResponse, nil
 
@@ -45,11 +56,16 @@ func (c *Client) LocationList(fullUrl string) (PokeLocationResponse, error){
 
 func (c *Client) GetNextLocationList(nextURL *string) (PokeLocationResponse, error) {
 	url := "location-area/"
+
 	fullUrl := baseUrl+url
 
 	if nextURL != nil {
 		fullUrl = *nextURL
 	}
+
+	
+
+
 	resp , err := c. LocationList(fullUrl)
 
 	if err != nil {
