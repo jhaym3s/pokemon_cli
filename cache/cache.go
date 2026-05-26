@@ -1,11 +1,14 @@
 package cache
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 
 type Cache struct {
 	cache map[string]cacheEntry
-
+	mu sync.Mutex
 }
 
 type cacheEntry struct{
@@ -13,13 +16,17 @@ type cacheEntry struct{
 	val []byte
 }
 
-func NewCache() Cache {
-	return Cache{
+func NewCache(interval time.Duration) *Cache {
+	chc:=  &Cache{
 		cache: make(map[string]cacheEntry),
 	}
+	go chc.LoopDelete(interval)  
+	return chc
 }
 
 func (c *Cache)Add( key string, val []byte){
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.cache[key] = cacheEntry{
 		val: val,
 		createdAt: time.Now(),
@@ -27,6 +34,8 @@ func (c *Cache)Add( key string, val []byte){
 }
 
 func (c *Cache)Get(key string)([]byte,bool){
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	entries, ok := c.cache[key]
 
 	return entries.val, ok
@@ -44,6 +53,8 @@ func (c *Cache)LoopDelete(t time.Duration){
 
 
 func (c *Cache)Delete(t time.Duration){
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	fiveMinAgo := time.Now().Add(-t)
 	for key, entry := range c.cache {
 			if (entry.createdAt.Before(fiveMinAgo)) {
